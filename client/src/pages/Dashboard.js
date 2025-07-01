@@ -23,17 +23,17 @@ const Dashboard = () => {
   const [activeTask, setActiveTask] = useState(null);
   const [readTimeout, setReadTimeout] = useState(null);
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const data = await getTasksAPI(token);
-        setTasks(data.tasks);
-      } catch (err) {
-        toast.error('Failed to load tasks');
-      }
-    };
+  const fetchTasks = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const data = await getTasksAPI(token);
+      setTasks(data.tasks);
+    } catch (err) {
+      toast.error('Failed to load tasks');
+    }
+  };
 
+  useEffect(() => {
     if (user) fetchTasks();
   }, [user]);
 
@@ -83,19 +83,20 @@ const Dashboard = () => {
   const handleCardClick = async (task) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await updateTaskAPI(task._id, { read: true }, token);
-      setTasks((prev) =>
-        prev.map((t) => (t._id === task._id ? res.task : t))
-      );
-      setActiveTask(res.task);
 
-      const timeout = setTimeout(() => {
-        handleComplete(task._id);
-        setActiveTask(null);
-      }, 15000);
-      setReadTimeout(timeout);
-    } catch {
-      toast.error('❌ Failed to open task');
+      if (!task.read) {
+        const readRes = await updateTaskAPI(task._id, { read: true }, token);
+        setTasks(prev => prev.map(t => t._id === task._id ? readRes.task : t));
+        setActiveTask(readRes.task);
+      } else {
+        setActiveTask(task);
+      }
+
+      if (readTimeout) clearTimeout(readTimeout);
+
+    } catch (err) {
+      toast.error('Failed to open task');
+      console.error(err);
     }
   };
 
@@ -103,11 +104,19 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const res = await toggleTaskCompletion(taskId, token);
-      setTasks((prev) =>
-        prev.map((t) => (t._id === taskId ? res.task : t))
-      );
-    } catch {
-      toast.error('❌ Toggle failed');
+
+      // Update task in list
+      setTasks(prev => prev.map(t => t._id === taskId ? res.task : t));
+
+      // Update modal task if it's the one being viewed
+      if (activeTask?._id === taskId) {
+        setActiveTask(res.task);
+      }
+
+      toast.success(res.task.completed ? '✅ Task completed!' : '⏳ Task marked incomplete');
+    } catch (err) {
+      toast.error('Failed to toggle completion');
+      console.error(err);
     }
   };
 
@@ -117,6 +126,7 @@ const Dashboard = () => {
     };
   }, [readTimeout]);
 
+  // Filter and sort tasks
   const filteredTasks = tasks.filter((task) =>
     filter === 'Completed' ? task.completed :
       filter === 'Pending' ? !task.completed : true
@@ -132,84 +142,36 @@ const Dashboard = () => {
     return 0;
   });
 
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter((t) => t.completed).length;
+  const pendingTasks = totalTasks - completedTasks;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Navbar />
       <main className="p-6 pt-24">
-        {/* 🌟 Dashboard Header with Animated Emoji */}
+
+        {/* Header */}
         <div className="flex flex-col items-center mb-8">
-          <div className="text-6xl mb-4 animate-bounce">📊</div>
+          <div className="mb-4 text-6xl animate-bounce">📊</div>
           <h1 className="text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-pink-500 to-red-500">
             Your Task Dashboard
           </h1>
           <p className="mt-2 text-gray-600">✨ Manage your tasks efficiently</p>
         </div>
 
-        {/* 📊 Stats Cards with Emoji Icons */}
+        {/* Stats */}
         <section className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-3">
-          <div className="p-6 bg-white rounded-xl shadow-lg transform transition-all hover:scale-105">
-            <div className="flex items-center">
-              <div className="p-3 mr-4 text-white bg-blue-500 rounded-full">📋</div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Tasks</p>
-                <h2 className="text-2xl font-bold">{tasks.length}</h2>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-6 bg-white rounded-xl shadow-lg transform transition-all hover:scale-105">
-            <div className="flex items-center">
-              <div className="p-3 mr-4 text-white bg-green-500 rounded-full">✅</div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Completed</p>
-                <h2 className="text-2xl font-bold">
-                  {tasks.filter((t) => t.completed).length}
-                </h2>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-6 bg-white rounded-xl shadow-lg transform transition-all hover:scale-105">
-            <div className="flex items-center">
-              <div className="p-3 mr-4 text-white bg-yellow-500 rounded-full">⏳</div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Pending</p>
-                <h2 className="text-2xl font-bold">
-                  {tasks.filter((t) => !t.completed).length}
-                </h2>
-              </div>
-            </div>
-          </div>
+          <StatCard icon="📋" label="Total Tasks" count={totalTasks} color="blue" />
+          <StatCard icon="✅" label="Completed" count={completedTasks} color="green" />
+          <StatCard icon="⏳" label="Pending" count={pendingTasks} color="yellow" />
         </section>
 
-        {/* 🛠️ Controls Section */}
-        <div className="flex flex-col justify-between p-6 mb-8 bg-white rounded-xl shadow-md sm:flex-row">
+        {/* Filters */}
+        <div className="flex flex-col justify-between p-6 mb-8 bg-white shadow-md rounded-xl sm:flex-row">
           <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3">🔍</span>
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option>All Tasks</option>
-                <option>Completed</option>
-                <option>Pending</option>
-              </select>
-            </div>
-
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3">📊</span>
-              <select
-                value={sort}
-                onChange={(e) => setSort(e.target.value)}
-                className="pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option>Newest First</option>
-                <option>Oldest First</option>
-                <option>Priority (High-Low)</option>
-              </select>
-            </div>
+            <SelectBox label="🔍" value={filter} onChange={setFilter} options={["All", "Completed", "Pending"]} />
+            <SelectBox label="📊" value={sort} onChange={setSort} options={["Newest", "Oldest", "Priority"]} />
           </div>
 
           <button
@@ -217,21 +179,20 @@ const Dashboard = () => {
               setEditingTask(null);
               setShowForm(true);
             }}
-            className="flex items-center px-6 py-3 mt-4 text-white bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg shadow-lg hover:from-blue-600 hover:to-purple-700 sm:mt-0"
+            className="flex items-center px-6 py-3 mt-4 text-white rounded-lg shadow-lg bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 sm:mt-0"
           >
             <span className="mr-2 text-xl">➕</span> Create New Task
           </button>
         </div>
 
+        {/* Task Form Modal */}
         {showForm && (
           <div className="fixed inset-0 z-50">
-            <div
-              className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"
               onClick={() => {
                 setShowForm(false);
                 setEditingTask(null);
-              }}
-            ></div>
+              }}></div>
             <div className="relative z-50 flex items-center justify-center w-full h-full">
               <TaskForm
                 task={editingTask}
@@ -246,8 +207,7 @@ const Dashboard = () => {
           </div>
         )}
 
-
-        {/* 🗂️ Task List */}
+        {/* Task Cards */}
         {sortedTasks.length > 0 ? (
           <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {sortedTasks.map((task) => (
@@ -261,27 +221,18 @@ const Dashboard = () => {
             ))}
           </section>
         ) : (
-          <div className="flex flex-col items-center justify-center p-12 text-center bg-white rounded-xl shadow-sm">
-            <div className="text-6xl mb-4">📭</div>
-            <h3 className="text-xl font-medium text-gray-700">No tasks found</h3>
-            <p className="mt-2 text-gray-500">Create your first task to get started!</p>
-            <button
-              onClick={() => setShowForm(true)}
-              className="flex items-center px-6 py-3 mt-6 text-white bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg shadow-lg hover:from-blue-600 hover:to-purple-700"
-            >
-              <span className="mr-2">➕</span> Create Task
-            </button>
-          </div>
+          <EmptyState onCreate={() => setShowForm(true)} />
         )}
 
-        {/* 🪟 Task Modal */}
+        {/* Task Detail Modal */}
         {activeTask && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-            <div className="relative w-full max-w-2xl p-8 mx-4 bg-white rounded-2xl shadow-2xl">
+            <div className="relative w-full max-w-2xl p-8 mx-4 bg-white shadow-2xl rounded-2xl">
               <button
                 onClick={() => {
                   setActiveTask(null);
                   if (readTimeout) clearTimeout(readTimeout);
+                  setTasks([...tasks]); // 🔁 Force update
                 }}
                 className="absolute p-2 text-gray-500 rounded-full top-4 right-4 hover:bg-gray-100 hover:text-gray-700"
               >
@@ -309,7 +260,7 @@ const Dashboard = () => {
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="px-4 py-2 rounded-full bg-gray-100">
+                <div className="px-4 py-2 bg-gray-100 rounded-full">
                   {activeTask.completed ? (
                     <span className="flex items-center text-green-600">
                       <span className="mr-2">✅</span> Completed
@@ -322,9 +273,11 @@ const Dashboard = () => {
                 </div>
 
                 <div className="flex space-x-3">
-
                   <button
-                    onClick={() => handleComplete(activeTask._id)}
+                    onClick={() => {
+                      handleComplete(activeTask._id);
+                      if (readTimeout) clearTimeout(readTimeout);
+                    }}
                     className="flex items-center px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600"
                   >
                     <span className="mr-2">✅</span> {activeTask.completed ? 'Undo' : 'Complete'}
@@ -334,9 +287,51 @@ const Dashboard = () => {
             </div>
           </div>
         )}
+
       </main>
     </div>
   );
 };
+
+const StatCard = ({ icon, label, count, color }) => (
+  <div className={`p-6 transition-all transform bg-white shadow-lg rounded-xl hover:scale-105`}>
+    <div className="flex items-center">
+      <div className={`p-3 mr-4 text-white bg-${color}-500 rounded-full`}>{icon}</div>
+      <div>
+        <p className="text-sm font-medium text-gray-600">{label}</p>
+        <h2 className="text-2xl font-bold">{count}</h2>
+      </div>
+    </div>
+  </div>
+);
+
+const SelectBox = ({ label, value, onChange, options }) => (
+  <div className="relative">
+    <span className="absolute inset-y-0 left-0 flex items-center pl-3">{label}</span>
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="py-2 pl-10 pr-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+    >
+      {options.map((opt) => (
+        <option key={opt} value={opt}>{opt} Tasks</option>
+      ))}
+    </select>
+  </div>
+);
+
+const EmptyState = ({ onCreate }) => (
+  <div className="flex flex-col items-center justify-center p-12 text-center bg-white shadow-sm rounded-xl">
+    <div className="mb-4 text-6xl">📭</div>
+    <h3 className="text-xl font-medium text-gray-700">No tasks found</h3>
+    <p className="mt-2 text-gray-500">Create your first task to get started!</p>
+    <button
+      onClick={onCreate}
+      className="flex items-center px-6 py-3 mt-6 text-white rounded-lg shadow-lg bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+    >
+      <span className="mr-2">➕</span> Create Task
+    </button>
+  </div>
+);
 
 export default Dashboard;

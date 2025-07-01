@@ -2,25 +2,30 @@ import React from 'react';
 
 const TaskCard = ({ task, onClick, onEdit, onDelete }) => {
   const getStatusBadge = () => {
+    // Completed takes highest priority
     if (task.completed) {
       return (
-        <span className="absolute flex items-center px-3 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full shadow-sm top-2 right-2 animate-pulse">
-          ✅ Done
-        </span>
-      );
-    } else if (task.read) {
-      return (
-        <span className="absolute flex items-center px-3 py-1 text-xs font-semibold text-blue-800 transition duration-200 bg-blue-100 rounded-full shadow-sm top-2 right-2">
-          👀 Viewed
-        </span>
-      );
-    } else {
-      return (
-        <span className="absolute flex items-center px-3 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full shadow-sm top-2 right-2 animate-bounce-slow">
-          ✨ New!
+        <span className="absolute flex items-center px-3 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full shadow-sm top-2 right-2">
+          ✅ Completed
         </span>
       );
     }
+
+    // Then check if read
+    if (task.read) {
+      return (
+        <span className="absolute flex items-center px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full shadow-sm top-2 right-2">
+          👀 Viewed
+        </span>
+      );
+    }
+
+    // Default to new task
+    return (
+      <span className="absolute flex items-center px-3 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full shadow-sm top-2 right-2">
+        ✨ New
+      </span>
+    );
   };
 
   const shortDescription =
@@ -72,12 +77,11 @@ const TaskCard = ({ task, onClick, onEdit, onDelete }) => {
       onClick={() => onClick(task)}
       className={`relative cursor-pointer p-6 rounded-2xl shadow-md transition duration-300 ease-in-out 
         hover:shadow-lg hover:-translate-y-1 hover:scale-[1.015] border-t-4
-        ${
-          task.completed
-            ? 'border-green-400 bg-gradient-to-br from-green-50 to-white'
-            : task.read
-            ? 'border-blue-400 bg-gradient-to-br from-blue-50 to-white'
-            : 'border-yellow-400 bg-gradient-to-br from-yellow-50 to-white'
+        ${task.completed
+          ? 'border-green-400 bg-green-50'
+          : task.read
+            ? 'border-blue-400 bg-blue-50'
+            : 'border-yellow-400 bg-yellow-50'
         }`}
     >
       {getStatusBadge()}
@@ -106,6 +110,7 @@ const TaskCard = ({ task, onClick, onEdit, onDelete }) => {
             {new Date(task.dueDate).toLocaleDateString('en-US', {
               month: 'short',
               day: 'numeric',
+              year: 'numeric'
             })}
           </span>
         )}
