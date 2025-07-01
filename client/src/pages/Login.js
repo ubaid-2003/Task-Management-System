@@ -3,12 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/auth';
 import { AuthContext } from '../context/AuthContext';
 
-const Login = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+const ADMIN_EMAIL = 'admin@gmail.com';
 
+const Login = () => {
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
@@ -27,7 +25,13 @@ const Login = () => {
       login(res.user);
 
       alert('Login successful');
-      navigate('/dashboard');
+
+      // 🔐 Redirect based on role
+      if (res.user.email === ADMIN_EMAIL || res.user.isAdmin) {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       console.error('Login Error:', err.response || err);
       alert(

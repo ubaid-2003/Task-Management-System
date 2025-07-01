@@ -1,5 +1,4 @@
 import User from '../models/User.js';
-import bcrypt from 'bcryptjs';
 
 export const ensureAdminExists = async () => {
   const adminEmail = 'admin@gmail.com';
@@ -8,19 +7,20 @@ export const ensureAdminExists = async () => {
   let admin = await User.findOne({ email: adminEmail });
 
   if (!admin) {
-    const hashed = await bcrypt.hash(adminPassword, 10);
-    admin = await User.create({
+    const adminUser = new User({
       name: 'Admin',
       email: adminEmail,
-      password: hashed,
-      isAdmin: true,
+      password: adminPassword,
+      isAdmin: true
     });
-    console.log('✅ Admin user created.');
+
+    await adminUser.save(); // Let pre-save middleware hash password
+    console.log('✅ Admin user created');
   } else if (!admin.isAdmin) {
     admin.isAdmin = true;
     await admin.save();
-    console.log('✅ Existing user promoted to Admin.');
+    console.log('✅ Existing user promoted to admin');
   } else {
-    console.log('✅ Admin user already exists.');
+    console.log('✅ Admin user already exists');
   }
 };

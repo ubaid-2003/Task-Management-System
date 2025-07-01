@@ -1,19 +1,14 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
+  name: { type: String, required: true, trim: true },
   email: {
     type: String,
     required: true,
     unique: true,
-    trim: true,
-    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email'],
-    lowercase: true
+    lowercase: true,
+    trim: true
   },
   password: {
     type: String,
@@ -24,20 +19,20 @@ const userSchema = new mongoose.Schema({
   isAdmin: {
     type: Boolean,
     default: false
-  },
+  }
 }, {
   timestamps: true,
-  toJSON: { virtuals: true },  // ✅ Required for frontend to get tasks
-  toObject: { virtuals: true } // ✅ Required for internal use
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
-// ✅ Define virtual: one-to-many relationship with Task model
 userSchema.virtual('tasks', {
   ref: 'Task',
   localField: '_id',
-  foreignField: 'user',
+  foreignField: 'user'
 });
 
+// ✅ Auto-hash only if password is not already hashed
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);

@@ -3,16 +3,11 @@ import generateToken from '../utils/generateToken.js';
 
 export const signup = async (req, res) => {
   const { name, email, password } = req.body;
-
-  console.log("📩 Incoming registration:", req.body); // Log user input
-
   try {
     const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(409).json({ error: "Email already in use" });
-    }
+    if (existingUser) return res.status(409).json({ error: 'Email already in use' });
 
-    const user = await User.create({ name, email, password }); // ⚠️ this might fail
+    const user = await User.create({ name, email, password });
 
     res.status(201).json({
       success: true,
@@ -22,26 +17,19 @@ export const signup = async (req, res) => {
         name: user.name,
         email: user.email,
         isAdmin: user.isAdmin,
-      },
+      }
     });
   } catch (error) {
-    console.error("❌ Registration backend error:", error); // <== Add this
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
-
 export const login = async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const user = await User.findOne({ email }).select('+password');
-
     if (!user || !(await user.matchPassword(password))) {
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid email or password'
-      });
+      return res.status(401).json({ success: false, error: 'Invalid email or password' });
     }
 
     res.status(200).json({
@@ -54,11 +42,7 @@ export const login = async (req, res) => {
         isAdmin: user.isAdmin
       }
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      success: false,
-      error: 'Server error'
-    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'Server error' });
   }
 };

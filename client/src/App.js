@@ -1,33 +1,41 @@
-// App.js
-import React, { useContext } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Dashboard from './pages/Dashboard';
-import AdminPanel from './pages/AdminPanel';
+import { AuthProvider } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import { AuthContext } from './context/AuthContext';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import Dashboard from './pages/Dashboard';
+import AdminPanel from './pages/AdminPanel';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
-  const { user, loading } = useContext(AuthContext);
-
-  if (loading) return <div className="mt-20 text-xl text-center">Loading...</div>;
-
   return (
-    <Router>
-   
-      <>
-        <ToastContainer position="top-center" autoClose={3000} />
+    <AuthProvider>
+      <Router>
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/admin" element={<AdminPanel />} />
+
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminPanel />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
-      </>
-    </Router>
+      </Router>
+    </AuthProvider>
   );
 }
 

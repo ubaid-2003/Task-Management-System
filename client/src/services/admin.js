@@ -1,14 +1,16 @@
-// src/services/admin.js
-import axios from 'axios';
+import api from './api';
 
-const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
-});
-
-// Only for fetching all users with tasks
 export const getAllUsersAPI = async (token) => {
-  const res = await API.get('/admin/users', {
+  const res = await api.get('/admin/users', {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return res.data; // if API returns an array of users directly
+  console.log("🚀 Fetched users:", res.data);
+  return res.data;
+};
+
+export const deleteUserAPI = async (userId, token) => {
+  const res = await api.delete(`/admin/users/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
 };

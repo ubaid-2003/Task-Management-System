@@ -1,6 +1,8 @@
+// ✅ routes/adminRoutes.js
 import express from 'express';
 import {
   getAllUsers,
+  deleteUserAndTasks,
   getPlatformStats,
   getUserTasks,
   createTaskForUser,
@@ -12,10 +14,10 @@ import { protect } from '../middleware/auth.js';
 import { isAdmin } from '../middleware/admin.js';
 
 const router = express.Router();
-
 router.use(protect, isAdmin);
 
 router.get('/users', getAllUsers);
+router.delete('/users/:id', deleteUserAndTasks);
 router.get('/stats', getPlatformStats);
 router.get('/users/:id/tasks', getUserTasks);
 router.post('/users/:id/tasks', createTaskForUser);
