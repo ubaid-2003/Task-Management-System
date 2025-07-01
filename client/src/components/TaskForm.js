@@ -37,25 +37,25 @@ const TaskForm = ({ onCancel, onCreate, onUpdate, task }) => {
 
   const handleClose = () => {
     setIsVisible(false);
-    setTimeout(onCancel, 300); // Wait for animation to complete
+    setTimeout(onCancel, 300);
   };
 
   return (
     <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${isVisible ? 'bg-black/50 backdrop-blur-md' : 'bg-transparent backdrop-blur-0'}`}>
       <div className={`w-full max-w-md bg-gradient-to-br from-white to-gray-50 shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 transform ${isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}>
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
-        
+
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+            <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
               {task ? '✏️ Edit Task' : '✨ Create New Task'}
             </h2>
-            <button 
+            <button
               onClick={handleClose}
-              className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+              className="p-1 text-gray-400 transition-colors hover:text-gray-600"
               aria-label="Close"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -72,10 +72,10 @@ const TaskForm = ({ onCancel, onCreate, onUpdate, task }) => {
                   onChange={handleChange}
                   required
                   placeholder="What needs to be done?"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 transition-all border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
                 />
-                <span className="absolute right-3 top-3 text-blue-500">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <span className="absolute text-blue-500 right-3 top-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
                   </svg>
                 </span>
@@ -92,10 +92,10 @@ const TaskForm = ({ onCancel, onCreate, onUpdate, task }) => {
                   required
                   placeholder="Add some details..."
                   rows="3"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 transition-all border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-transparent"
                 />
-                <span className="absolute right-3 top-3 text-purple-500">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <span className="absolute text-purple-500 right-3 top-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                   </svg>
                 </span>
@@ -110,14 +110,14 @@ const TaskForm = ({ onCancel, onCreate, onUpdate, task }) => {
                     name="priority"
                     value={formData.priority}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 appearance-none border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 transition-all border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:border-transparent"
                   >
                     <option value="high">🚀 High Priority</option>
                     <option value="medium">🛠️ Medium Priority</option>
                     <option value="low">🌱 Low Priority</option>
                   </select>
-                  <span className="absolute right-3 top-3 text-yellow-500 pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <span className="absolute text-yellow-500 pointer-events-none right-3 top-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
                   </span>
@@ -131,10 +131,10 @@ const TaskForm = ({ onCancel, onCreate, onUpdate, task }) => {
                     name="dueDate"
                     value={formData.dueDate}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 transition-all border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-transparent"
                   />
-                  <span className="absolute right-3 top-3 text-green-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <span className="absolute text-green-500 right-3 top-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
                     </svg>
                   </span>

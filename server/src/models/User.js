@@ -32,7 +32,6 @@ userSchema.virtual('tasks', {
   foreignField: 'user'
 });
 
-// ✅ Auto-hash only if password is not already hashed
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);

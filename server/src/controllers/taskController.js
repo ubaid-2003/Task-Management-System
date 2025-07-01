@@ -58,7 +58,6 @@ export const deleteTask = async (req, res) => {
   }
 };
 
-// TOGGLE task completion
 export const toggleTask = async (req, res) => {
   try {
     const task = await Task.findOne({ _id: req.params.id, user: req.user._id });

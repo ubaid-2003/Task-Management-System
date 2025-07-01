@@ -2,7 +2,7 @@ import React from 'react';
 
 const TaskCard = ({ task, onClick, onEdit, onDelete }) => {
   const getStatusBadge = () => {
-    // Completed takes highest priority
+
     if (task.completed) {
       return (
         <span className="absolute flex items-center px-3 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full shadow-sm top-2 right-2">
@@ -11,7 +11,6 @@ const TaskCard = ({ task, onClick, onEdit, onDelete }) => {
       );
     }
 
-    // Then check if read
     if (task.read) {
       return (
         <span className="absolute flex items-center px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full shadow-sm top-2 right-2">
@@ -20,7 +19,6 @@ const TaskCard = ({ task, onClick, onEdit, onDelete }) => {
       );
     }
 
-    // Default to new task
     return (
       <span className="absolute flex items-center px-3 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full shadow-sm top-2 right-2">
         ✨ New

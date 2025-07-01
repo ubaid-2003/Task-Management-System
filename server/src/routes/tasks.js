@@ -10,7 +10,6 @@ import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// backend route file: src/routes/tasks.js
 router.get('/', protect, getTasks);
 router.post('/', protect, createTask);
 router.put('/:id', protect, updateTask);

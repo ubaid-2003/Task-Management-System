@@ -14,7 +14,7 @@ export const ensureAdminExists = async () => {
       isAdmin: true
     });
 
-    await adminUser.save(); // Let pre-save middleware hash password
+    await adminUser.save(); 
     console.log('✅ Admin user created');
   } else if (!admin.isAdmin) {
     admin.isAdmin = true;

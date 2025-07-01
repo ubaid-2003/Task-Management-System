@@ -105,10 +105,8 @@ const Dashboard = () => {
       const token = localStorage.getItem('token');
       const res = await toggleTaskCompletion(taskId, token);
 
-      // Update task in list
       setTasks(prev => prev.map(t => t._id === taskId ? res.task : t));
 
-      // Update modal task if it's the one being viewed
       if (activeTask?._id === taskId) {
         setActiveTask(res.task);
       }
@@ -126,7 +124,6 @@ const Dashboard = () => {
     };
   }, [readTimeout]);
 
-  // Filter and sort tasks
   const filteredTasks = tasks.filter((task) =>
     filter === 'Completed' ? task.completed :
       filter === 'Pending' ? !task.completed : true
@@ -151,7 +148,6 @@ const Dashboard = () => {
       <Navbar />
       <main className="p-6 pt-24">
 
-        {/* Header */}
         <div className="flex flex-col items-center mb-8">
           <div className="mb-4 text-6xl animate-bounce">📊</div>
           <h1 className="text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-pink-500 to-red-500">
@@ -160,14 +156,12 @@ const Dashboard = () => {
           <p className="mt-2 text-gray-600">✨ Manage your tasks efficiently</p>
         </div>
 
-        {/* Stats */}
         <section className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-3">
           <StatCard icon="📋" label="Total Tasks" count={totalTasks} color="blue" />
           <StatCard icon="✅" label="Completed" count={completedTasks} color="green" />
           <StatCard icon="⏳" label="Pending" count={pendingTasks} color="yellow" />
         </section>
 
-        {/* Filters */}
         <div className="flex flex-col justify-between p-6 mb-8 bg-white shadow-md rounded-xl sm:flex-row">
           <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
             <SelectBox label="🔍" value={filter} onChange={setFilter} options={["All", "Completed", "Pending"]} />
@@ -185,7 +179,6 @@ const Dashboard = () => {
           </button>
         </div>
 
-        {/* Task Form Modal */}
         {showForm && (
           <div className="fixed inset-0 z-50">
             <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"
@@ -207,7 +200,6 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* Task Cards */}
         {sortedTasks.length > 0 ? (
           <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {sortedTasks.map((task) => (
@@ -224,7 +216,6 @@ const Dashboard = () => {
           <EmptyState onCreate={() => setShowForm(true)} />
         )}
 
-        {/* Task Detail Modal */}
         {activeTask && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
             <div className="relative w-full max-w-2xl p-8 mx-4 bg-white shadow-2xl rounded-2xl">
@@ -232,7 +223,7 @@ const Dashboard = () => {
                 onClick={() => {
                   setActiveTask(null);
                   if (readTimeout) clearTimeout(readTimeout);
-                  setTasks([...tasks]); // 🔁 Force update
+                  setTasks([...tasks]); 
                 }}
                 className="absolute p-2 text-gray-500 rounded-full top-4 right-4 hover:bg-gray-100 hover:text-gray-700"
               >
